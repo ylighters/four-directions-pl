@@ -1,4 +1,4 @@
-﻿package com.example.payment.infrastructure.persistence.mapper;
+package com.example.payment.infrastructure.persistence.mapper;
 
 import com.example.payment.infrastructure.persistence.po.OutboxMessagePO;
 import org.apache.ibatis.annotations.Insert;

@@ -1,4 +1,4 @@
-﻿-- MySQL 8.0+
+-- MySQL 8.0+
 -- 聚合支付中台完整基础表结构（不含订单分表，分表DDL在 02_order_sharding.sql）
 
 CREATE DATABASE IF NOT EXISTS payment_center DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci;

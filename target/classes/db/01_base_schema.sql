@@ -1,4 +1,4 @@
-﻿-- MySQL 8.0+
+-- MySQL 8.0+
 -- 聚合支付中台完整基础表结构（不含订单分表，分表DDL在 02_order_sharding.sql）
 
 CREATE DATABASE IF NOT EXISTS payment_center DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci;
@@ -77,6 +77,16 @@ CREATE TABLE IF NOT EXISTS pay_order_ext (
     client_ip           VARCHAR(64) DEFAULT NULL,
     created_at          DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
     updated_at          DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3) ON UPDATE CURRENT_TIMESTAMP(3),
+    UNIQUE KEY uk_order_no (order_no),
+    KEY idx_merchant_no (merchant_no)
+) ENGINE=InnoDB;
+
+CREATE TABLE IF NOT EXISTS pay_order_index (
+    id                  BIGINT PRIMARY KEY AUTO_INCREMENT,
+    order_no            VARCHAR(64) NOT NULL,
+    merchant_no         VARCHAR(32) NOT NULL,
+    app_id              VARCHAR(64) NOT NULL,
+    created_at          DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
     UNIQUE KEY uk_order_no (order_no),
     KEY idx_merchant_no (merchant_no)
 ) ENGINE=InnoDB;

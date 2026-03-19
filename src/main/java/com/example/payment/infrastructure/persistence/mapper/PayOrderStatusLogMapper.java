@@ -1,4 +1,4 @@
-﻿package com.example.payment.infrastructure.persistence.mapper;
+package com.example.payment.infrastructure.persistence.mapper;
 
 import org.apache.ibatis.annotations.Insert;
 import org.apache.ibatis.annotations.Mapper;

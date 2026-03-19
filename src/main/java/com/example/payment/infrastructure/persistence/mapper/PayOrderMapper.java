@@ -1,4 +1,4 @@
-﻿package com.example.payment.infrastructure.persistence.mapper;
+package com.example.payment.infrastructure.persistence.mapper;
 
 import com.example.payment.infrastructure.persistence.po.PayOrderPO;
 import org.apache.ibatis.annotations.Insert;

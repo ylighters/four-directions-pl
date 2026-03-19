@@ -1,4 +1,4 @@
-﻿package com.example.payment.application.dto;
+package com.example.payment.application.dto;
 
 import jakarta.validation.constraints.DecimalMin;
 import jakarta.validation.constraints.NotBlank;

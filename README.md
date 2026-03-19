@@ -1,9 +1,9 @@
-﻿# Payment Platform (MyBatis + ShardingSphere + RocketMQ Outbox)
+# Payment Platform (MyBatis + ShardingSphere + RocketMQ Outbox)
 
 ## What is implemented
 
 - MyBatis persistence for `pay_order`, `pay_order_index`, and `mq_outbox`
-- ShardingSphere real table routing for `pay_order_00 ~ pay_order_63`
+- ShardingSphere real table routing for `pay_order_00 ~ pay_order_63` (built-in `HASH_MOD`)
 - Transactional order flow: order/status log/outbox written in one DB transaction
 - Outbox scanner + RocketMQ delivery + retry
 - Payment state machine and event-driven transition
@@ -11,10 +11,10 @@
 ## Key files
 
 - App config: `src/main/resources/application.yml`
+- ShardingSphere config: `src/main/resources/sharding.yaml`
 - Base schema: `src/main/resources/db/01_base_schema.sql`
 - Sharding DDL: `src/main/resources/db/02_order_sharding.sql`
 - Order repository: `src/main/java/com/example/payment/infrastructure/persistence/repository/MybatisPaymentOrderRepository.java`
-- Sharding algorithm: `src/main/java/com/example/payment/infrastructure/sharding/MerchantNoHashShardingAlgorithm.java`
 - Outbox publisher: `src/main/java/com/example/payment/infrastructure/mq/OutboxPaymentEventPublisher.java`
 - Outbox dispatcher: `src/main/java/com/example/payment/infrastructure/mq/outbox/OutboxDispatcher.java`
 - Payment service: `src/main/java/com/example/payment/application/service/PaymentApplicationService.java`
@@ -38,7 +38,7 @@ The second script creates `pay_order_00` to `pay_order_63` by procedure.
 - Logical table: `pay_order`
 - Physical tables: `pay_order_00 ~ pay_order_63`
 - Sharding key: `merchant_no`
-- Routing rule: `Math.floorMod(merchantNo.hashCode(), 64)`
+- Routing rule: ShardingSphere `HASH_MOD` with `sharding-count=64`
 - Lookup optimization: `pay_order_index(order_no -> merchant_no)` avoids full-shard scan
 
 ## Transactional message chain (Outbox pattern)
@@ -82,3 +82,33 @@ curl -X POST "http://localhost:8080/api/payments/orders/{orderNo}/events?eventTy
 
 - `mvn` is not available in this execution environment, so compile/run was not executed here.
 - If your local Maven is ready, run `mvn spring-boot:run`.
+
+## Frontend (React + TypeScript + Tailwind)
+
+Frontend project path: `frontend`
+
+### Start
+
+```bash
+cd frontend
+npm install
+npm run dev
+```
+
+Vite dev server: `http://localhost:5173` (proxy `/api` to `http://localhost:8080`)
+
+### Auth test accounts
+
+- `admin / admin123` -> role `ADMIN`
+- `operator / operator123` -> role `OPERATOR`
+- `auditor / auditor123` -> role `AUDITOR`
+
+Different roles show different menus on home page.
+
+### Lint & format
+
+```bash
+cd frontend
+npm run lint
+npm run format
+```

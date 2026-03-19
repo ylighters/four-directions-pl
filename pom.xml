@@ -49,7 +49,7 @@
         </dependency>
         <dependency>
             <groupId>org.apache.shardingsphere</groupId>
-            <artifactId>shardingsphere-jdbc-core-spring-boot-starter</artifactId>
+            <artifactId>shardingsphere-jdbc</artifactId>
             <version>5.5.0</version>
         </dependency>
         <dependency>

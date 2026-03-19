@@ -1,4 +1,4 @@
-﻿package com.example.payment.infrastructure.repository;
+package com.example.payment.infrastructure.repository;
 
 import com.example.payment.domain.model.PaymentOrder;
 

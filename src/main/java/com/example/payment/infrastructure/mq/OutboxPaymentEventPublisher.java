@@ -1,4 +1,4 @@
-﻿package com.example.payment.infrastructure.mq;
+package com.example.payment.infrastructure.mq;
 
 import com.example.payment.infrastructure.persistence.po.OutboxMessagePO;
 import com.example.payment.infrastructure.persistence.mapper.OutboxMapper;

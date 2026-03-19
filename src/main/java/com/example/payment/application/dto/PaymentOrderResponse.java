@@ -1,4 +1,4 @@
-﻿package com.example.payment.application.dto;
+package com.example.payment.application.dto;
 
 import com.example.payment.domain.enums.PaymentStatus;
 

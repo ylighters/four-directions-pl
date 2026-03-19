@@ -1,4 +1,4 @@
-﻿package com.example.payment.infrastructure.persistence.repository;
+package com.example.payment.infrastructure.persistence.repository;
 
 import com.example.payment.domain.enums.PaymentStatus;
 import com.example.payment.domain.model.PaymentOrder;

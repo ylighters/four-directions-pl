@@ -1,4 +1,4 @@
-﻿package com.example.payment.infrastructure.persistence;
+package com.example.payment.infrastructure.persistence;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;

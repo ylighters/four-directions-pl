@@ -1,4 +1,4 @@
-﻿package com.example.payment.domain.state;
+package com.example.payment.domain.state;
 
 import com.example.payment.domain.enums.PaymentEventType;
 import com.example.payment.domain.enums.PaymentStatus;

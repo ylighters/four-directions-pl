@@ -1,4 +1,4 @@
-﻿package com.example.payment.infrastructure.mq;
+package com.example.payment.infrastructure.mq;
 
 public interface PaymentEventPublisher {
 

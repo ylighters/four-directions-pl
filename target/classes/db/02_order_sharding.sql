@@ -1,4 +1,4 @@
-﻿-- MySQL 8.0+
+-- MySQL 8.0+
 -- 订单分表DDL（建议 64 分片，可按业务量扩到 128/256）
 -- 路由键: merchant_no_hash % 64
 
@@ -44,7 +44,7 @@ BEGIN
     DECLARE sql_text TEXT;
 
     WHILE i < shard_count DO
-        SET table_name = CONCAT('pay_order_', LPAD(i, 2, '0'));
+        SET table_name = CONCAT('pay_order_', i);
         SET sql_text = CONCAT('CREATE TABLE IF NOT EXISTS ', table_name, ' LIKE pay_order_template');
         PREPARE stmt FROM sql_text;
         EXECUTE stmt;
@@ -56,11 +56,11 @@ DELIMITER ;
 
 CALL create_pay_order_shards(64);
 
+-- 兼容旧命名（pay_order_00 ~ pay_order_63），可选执行:
+-- CALL create_pay_order_shards_padded(64);
+
 -- 线上执行后可删除模板表（如不需要）
 -- DROP TABLE pay_order_template;
 
--- 示例: 单独查看某个分片表DDL
--- SHOW CREATE TABLE pay_order_00;
-
 -- 可选: 按月归档历史订单，保持热数据可控
--- CREATE TABLE pay_order_202603_00 LIKE pay_order_00;
+-- CREATE TABLE pay_order_202603_0 LIKE pay_order_0;

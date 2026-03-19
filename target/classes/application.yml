@@ -1,4 +1,4 @@
-﻿server:
+server:
   port: 8080
 
 spring:
@@ -6,37 +6,9 @@ spring:
     name: payment-platform
   jackson:
     default-property-inclusion: non_null
-  shardingsphere:
-    mode:
-      type: Memory
-    datasource:
-      names: ds0
-      ds0:
-        type: com.zaxxer.hikari.HikariDataSource
-        driver-class-name: com.mysql.cj.jdbc.Driver
-        jdbc-url: jdbc:mysql://127.0.0.1:3306/payment_center?useUnicode=true&characterEncoding=utf8&serverTimezone=Asia/Shanghai&useSSL=false&allowPublicKeyRetrieval=true
-        username: root
-        password: root
-        maximum-pool-size: 40
-        minimum-idle: 10
-        connection-timeout: 3000
-    rules:
-      sharding:
-        tables:
-          pay_order:
-            actual-data-nodes: ds0.pay_order_$->{00..63}
-            table-strategy:
-              standard:
-                sharding-column: merchant_no
-                sharding-algorithm-name: pay-order-merchant-hash
-        sharding-algorithms:
-          pay-order-merchant-hash:
-            type: CLASS_BASED
-            props:
-              strategy: standard
-              algorithmClassName: com.example.payment.infrastructure.sharding.MerchantNoHashShardingAlgorithm
-    props:
-      sql-show: true
+  datasource:
+    driver-class-name: org.apache.shardingsphere.driver.ShardingSphereDriver
+    url: jdbc:shardingsphere:classpath:sharding.yaml
 
 mybatis:
   configuration:
@@ -50,6 +22,7 @@ rocketmq:
 
 payment:
   mq:
+    enabled: false
     pay-order-topic: pay.order.changed
     outbox-scan-batch-size: 100
     outbox-retry-seconds: 30

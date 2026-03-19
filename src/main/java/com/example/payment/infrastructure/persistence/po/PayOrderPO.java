@@ -1,4 +1,4 @@
-﻿package com.example.payment.infrastructure.persistence.po;
+package com.example.payment.infrastructure.persistence.po;
 
 import java.time.LocalDateTime;
 

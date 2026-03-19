@@ -1,4 +1,4 @@
-﻿package com.example.payment.interfaces.rest;
+package com.example.payment.interfaces.rest;
 
 import com.example.payment.application.dto.CreatePaymentOrderRequest;
 import com.example.payment.application.dto.PaymentOrderResponse;

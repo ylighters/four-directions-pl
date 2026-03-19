@@ -1,4 +1,4 @@
-﻿package com.example.payment.domain.model;
+package com.example.payment.domain.model;
 
 import com.example.payment.domain.enums.PaymentEventType;
 

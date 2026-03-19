@@ -1,4 +1,4 @@
-﻿package com.example.payment.infrastructure.mq.outbox;
+package com.example.payment.infrastructure.mq.outbox;
 
 import com.example.payment.infrastructure.persistence.po.OutboxMessagePO;
 import com.example.payment.infrastructure.persistence.mapper.OutboxMapper;
@@ -7,6 +7,7 @@ import org.apache.rocketmq.spring.core.RocketMQTemplate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
@@ -15,6 +16,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 @Component
+@ConditionalOnProperty(prefix = "payment.mq", name = "enabled", havingValue = "true")
 public class OutboxDispatcher {
 
     private static final Logger log = LoggerFactory.getLogger(OutboxDispatcher.class);

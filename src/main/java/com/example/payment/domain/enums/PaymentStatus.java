@@ -1,4 +1,4 @@
-﻿package com.example.payment.domain.enums;
+package com.example.payment.domain.enums;
 
 public enum PaymentStatus {
     CREATED,
