@@ -9,6 +9,10 @@ import org.springframework.stereotype.Component;
 
 import java.time.LocalDateTime;
 
+/**
+ * 基于 Outbox 表的事件发布实现。
+ * 先落库，再由扫描任务异步投递到 MQ，保证本地事务一致性。
+ */
 @Component
 public class OutboxPaymentEventPublisher implements PaymentEventPublisher {
 
@@ -26,6 +30,7 @@ public class OutboxPaymentEventPublisher implements PaymentEventPublisher {
 
     @Override
     public void publish(PaymentOrderChangedMessage message) {
+        // 先写 Outbox，确保订单事务提交后消息不会丢失。
         OutboxMessagePO messageDO = new OutboxMessagePO();
         messageDO.setMsgId(message.getMessageId());
         messageDO.setTopic(payOrderTopic + ":" + message.getEventType());
@@ -37,6 +42,9 @@ public class OutboxPaymentEventPublisher implements PaymentEventPublisher {
         outboxMapper.insert(messageDO);
     }
 
+    /**
+     * 消息体序列化为 JSON。
+     */
     private String writeJson(PaymentOrderChangedMessage message) {
         try {
             return objectMapper.writeValueAsString(message);

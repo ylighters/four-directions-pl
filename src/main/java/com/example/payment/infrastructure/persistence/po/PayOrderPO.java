@@ -2,6 +2,9 @@ package com.example.payment.infrastructure.persistence.po;
 
 import java.time.LocalDateTime;
 
+/**
+ * 支付订单持久化对象（与 pay_order 表字段一一对应）。
+ */
 public class PayOrderPO {
 
     private Long id;

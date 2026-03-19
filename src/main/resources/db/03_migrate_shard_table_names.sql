@@ -1,4 +1,4 @@
-﻿CREATE DEFINER=`root`@`localhost` PROCEDURE `migrate_pay_order_shards_to_non_padded`()
+CREATE DEFINER=`root`@`localhost` PROCEDURE `migrate_pay_order_shards_to_non_padded`()
 BEGIN
     DECLARE i INT DEFAULT 0;
     DECLARE src_table VARCHAR(64);

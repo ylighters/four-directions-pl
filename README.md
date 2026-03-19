@@ -30,6 +30,8 @@ Run SQL in order:
 
 1. `src/main/resources/db/01_base_schema.sql`
 2. `src/main/resources/db/02_order_sharding.sql`
+3. `src/main/resources/db/04_rbac_schema.sql`
+4. `src/main/resources/db/05_pay_channel_seed.sql`
 
 The second script creates `pay_order_00` to `pay_order_63` by procedure.
 
@@ -104,6 +106,80 @@ Vite dev server: `http://localhost:5173` (proxy `/api` to `http://localhost:8080
 - `auditor / auditor123` -> role `AUDITOR`
 
 Different roles show different menus on home page.
+
+## RBAC APIs
+
+- Login: `POST /api/auth/login`
+- Current user: `GET /api/auth/me`
+- Menu CRUD: `GET/POST/PUT/DELETE /api/system/menus`
+- Role CRUD: `GET/POST/PUT/DELETE /api/system/roles`
+- User CRUD: `GET/POST/PUT/DELETE /api/system/users`
+- PayChannel CRUD: `GET/POST/PUT/DELETE /api/system/pay-channels`
+
+Permissions are read from DB tables:
+
+- `sys_user`
+- `sys_role`
+- `sys_menu`
+- `sys_user_role_rel`
+- `sys_role_menu_rel`
+
+`admin` is super admin and always gets all menus.
+
+## Channel Integration Skeleton (Wechat / Alipay / Allinpay)
+
+- Channel abstraction: `infrastructure/channel/ChannelClient.java`
+- Implementations:
+  - `WechatChannelClient.java`
+  - `AlipayChannelClient.java`
+  - `AllinpayChannelClient.java`
+- Channel config reader:
+  - `PayChannelMapper.java`
+  - `ChannelRoutingService.java`
+- High availability entry:
+  - `PaymentApplicationService#createCashierOrder`
+  - Multi-channel failover in same platform type
+  - Timeout/retry/bulkhead in `ChannelHttpExecutor`
+
+### Replace with official SDK signing
+
+Current `ChannelCryptoFacade` is a pluggable signing/verify facade.
+You can replace methods with official SDK calls:
+
+- `signWechatV3 / verifyWechatV3`
+- `signAlipay / verifyAlipay`
+- `signAllinpay / verifyAllinpay`
+
+## Official SDK status
+
+- Wechat: implemented with official `wechatpay-apache-httpclient`
+- Alipay: implemented with official `alipay-sdk-java`
+- Allinpay: skeleton kept, waiting for your production SDK/doc
+
+### pay_channel.api_config required keys
+
+- `WX_NATIVE`
+  - `gatewayUrl`
+  - `mchId`
+  - `appId`
+  - `serialNo`
+  - `privateKey` (PEM content)
+  - `apiV3Key`
+- `ALI_QR`
+  - `gatewayUrl`
+  - `appId`
+  - `privateKey`
+  - `alipayPublicKey`
+  - `signType` (`RSA2`)
+
+### HA behavior
+
+- `createCashierOrder` supports same-platform channel failover:
+  - if first active channel fails, automatically tries next active channel
+- HTTP invocation has:
+  - timeout
+  - retry
+  - bulkhead isolation per channel
 
 ### Lint & format
 

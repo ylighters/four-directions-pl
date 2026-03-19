@@ -6,6 +6,10 @@ import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.Objects;
 
+/**
+ * 支付订单聚合根。
+ * 封装订单核心字段与状态变更行为。
+ */
 public class PaymentOrder {
 
     private Long id;
@@ -27,6 +31,9 @@ public class PaymentOrder {
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 
+    /**
+     * 创建新订单，默认状态为 CREATED。
+     */
     public static PaymentOrder create(String orderNo,
                                       String merchantNo,
                                       String appId,
@@ -57,6 +64,9 @@ public class PaymentOrder {
         return order;
     }
 
+    /**
+     * 更新订单状态并刷新更新时间。
+     */
     public void markStatus(PaymentStatus newStatus) {
         this.status = Objects.requireNonNull(newStatus, "newStatus cannot be null");
         this.updatedAt = LocalDateTime.now();

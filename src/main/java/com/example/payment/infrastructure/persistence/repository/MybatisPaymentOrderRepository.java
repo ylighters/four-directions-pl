@@ -9,8 +9,13 @@ import com.example.payment.infrastructure.persistence.mapper.PayOrderMapper;
 import com.example.payment.infrastructure.repository.PaymentOrderRepository;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
 import java.util.Optional;
 
+/**
+ * 基于 MyBatis 的支付订单仓储实现。
+ * 负责领域对象与持久化对象之间的映射，以及并发更新控制。
+ */
 @Repository
 public class MybatisPaymentOrderRepository implements PaymentOrderRepository {
 
@@ -24,6 +29,7 @@ public class MybatisPaymentOrderRepository implements PaymentOrderRepository {
 
     @Override
     public void save(PaymentOrder order) {
+        // 新订单：写主表 + 写索引表（用于按 orderNo 快速反查商户分片键）。
         if (order.getId() == null) {
             PayOrderPO insertDO = toDO(order);
             payOrderMapper.insert(insertDO);
@@ -32,6 +38,7 @@ public class MybatisPaymentOrderRepository implements PaymentOrderRepository {
             return;
         }
 
+        // 老订单：乐观锁更新，避免并发覆盖。
         PayOrderPO updateDO = toDO(order);
         int updated = payOrderMapper.updateStatusWithVersion(updateDO);
         if (updated <= 0) {
@@ -42,6 +49,7 @@ public class MybatisPaymentOrderRepository implements PaymentOrderRepository {
 
     @Override
     public Optional<PaymentOrder> findByOrderNo(String orderNo) {
+        // 先走索引表拿 merchantNo，再命中分片主表。
         String merchantNo = payOrderIndexMapper.selectMerchantNoByOrderNo(orderNo);
         if (merchantNo == null) {
             return Optional.empty();
@@ -49,6 +57,26 @@ public class MybatisPaymentOrderRepository implements PaymentOrderRepository {
         return Optional.ofNullable(payOrderMapper.selectByOrderNo(orderNo, merchantNo)).map(this::toDomain);
     }
 
+    @Override
+    public Optional<PaymentOrder> findByMerchantOrder(String merchantNo, String appId, String merchantOrderNo) {
+        return Optional.ofNullable(payOrderMapper.selectByMerchantOrder(merchantNo, appId, merchantOrderNo))
+                .map(this::toDomain);
+    }
+
+    @Override
+    public List<PaymentOrder> findPageByMerchant(String merchantNo, String appId, int pageNo, int pageSize) {
+        int safePageNo = Math.max(pageNo, 1);
+        int safePageSize = Math.max(1, Math.min(pageSize, 200));
+        int offset = (safePageNo - 1) * safePageSize;
+        return payOrderMapper.selectPageByMerchant(merchantNo, appId, offset, safePageSize)
+                .stream()
+                .map(this::toDomain)
+                .toList();
+    }
+
+    /**
+     * 领域对象 -> 持久化对象。
+     */
     private PayOrderPO toDO(PaymentOrder order) {
         PayOrderPO orderDO = new PayOrderPO();
         orderDO.setId(order.getId());
@@ -70,6 +98,9 @@ public class MybatisPaymentOrderRepository implements PaymentOrderRepository {
         return orderDO;
     }
 
+    /**
+     * 持久化对象 -> 领域对象。
+     */
     private PaymentOrder toDomain(PayOrderPO orderDO) {
         PaymentOrder order = new PaymentOrder();
         order.setId(orderDO.getId());

@@ -6,6 +6,9 @@ import jakarta.validation.constraints.NotNull;
 
 import java.math.BigDecimal;
 
+/**
+ * 通用下单请求参数。
+ */
 public class CreatePaymentOrderRequest {
 
     @NotBlank

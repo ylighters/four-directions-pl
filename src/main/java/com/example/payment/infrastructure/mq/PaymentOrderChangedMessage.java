@@ -5,6 +5,10 @@ import com.example.payment.domain.enums.PaymentStatus;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
+/**
+ * 订单变更消息体。
+ * 由支付域发布，供下游账务、风控、通知等系统消费。
+ */
 public class PaymentOrderChangedMessage {
 
     private String messageId;
@@ -16,6 +20,9 @@ public class PaymentOrderChangedMessage {
     private PaymentStatus status;
     private LocalDateTime eventTime;
 
+    /**
+     * 工厂方法，统一构造消息对象。
+     */
     public static PaymentOrderChangedMessage of(String messageId,
                                                 String eventType,
                                                 String orderNo,

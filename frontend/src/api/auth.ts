@@ -1,15 +1,27 @@
-﻿export type UserRole = 'ADMIN' | 'OPERATOR' | 'AUDITOR';
+export type UserRole = 'ADMIN' | 'OPERATOR' | 'AUDITOR' | string;
 
 export interface LoginPayload {
   username: string;
   password: string;
 }
 
+export interface LoginMenuItem {
+  id: number;
+  parentId: number;
+  menuName: string;
+  menuPath: string;
+  icon?: string;
+  sortNo: number;
+}
+
 export interface LoginResult {
   accessToken: string;
+  userId: number;
   username: string;
   displayName: string;
-  role: UserRole;
+  admin: boolean;
+  roleCodes: UserRole[];
+  menus: LoginMenuItem[];
 }
 
 export async function login(payload: LoginPayload): Promise<LoginResult> {

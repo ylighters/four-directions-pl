@@ -1,37 +1,38 @@
 package com.example.payment.interfaces.rest.auth;
 
+import com.example.payment.application.service.AuthApplicationService;
+import com.example.payment.infrastructure.auth.AuthContextHolder;
+import com.example.payment.infrastructure.auth.LoginSession;
 import jakarta.validation.Valid;
-import org.springframework.http.HttpStatus;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
-
-import java.util.Map;
-import java.util.UUID;
+import org.springframework.http.HttpStatus;
 
 @RestController
 @RequestMapping("/api/auth")
 public class AuthController {
 
-    private static final Map<String, UserSeed> USERS = Map.of(
-            "admin", new UserSeed("admin123", "管理员", "ADMIN"),
-            "operator", new UserSeed("operator123", "运营人员", "OPERATOR"),
-            "auditor", new UserSeed("auditor123", "审计人员", "AUDITOR")
-    );
+    private final AuthApplicationService authApplicationService;
+
+    public AuthController(AuthApplicationService authApplicationService) {
+        this.authApplicationService = authApplicationService;
+    }
 
     @PostMapping("/login")
     public LoginResponse login(@Valid @RequestBody LoginRequest request) {
-        UserSeed user = USERS.get(request.getUsername());
-        if (user == null || !user.password().equals(request.getPassword())) {
-            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "用户名或密码错误");
-        }
-
-        String token = "demo-token-" + UUID.randomUUID();
-        return LoginResponse.of(token, request.getUsername(), user.displayName(), user.role());
+        return authApplicationService.login(request.getUsername(), request.getPassword());
     }
 
-    private record UserSeed(String password, String displayName, String role) {
+    @GetMapping("/me")
+    public LoginResponse me() {
+        LoginSession session = AuthContextHolder.get();
+        if (session == null) {
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "未登录");
+        }
+        return authApplicationService.me(session);
     }
 }
