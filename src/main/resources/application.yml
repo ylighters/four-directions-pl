@@ -1,0 +1,61 @@
+﻿server:
+  port: 8080
+
+spring:
+  application:
+    name: payment-platform
+  jackson:
+    default-property-inclusion: non_null
+  shardingsphere:
+    mode:
+      type: Memory
+    datasource:
+      names: ds0
+      ds0:
+        type: com.zaxxer.hikari.HikariDataSource
+        driver-class-name: com.mysql.cj.jdbc.Driver
+        jdbc-url: jdbc:mysql://127.0.0.1:3306/payment_center?useUnicode=true&characterEncoding=utf8&serverTimezone=Asia/Shanghai&useSSL=false&allowPublicKeyRetrieval=true
+        username: root
+        password: root
+        maximum-pool-size: 40
+        minimum-idle: 10
+        connection-timeout: 3000
+    rules:
+      sharding:
+        tables:
+          pay_order:
+            actual-data-nodes: ds0.pay_order_$->{00..63}
+            table-strategy:
+              standard:
+                sharding-column: merchant_no
+                sharding-algorithm-name: pay-order-merchant-hash
+        sharding-algorithms:
+          pay-order-merchant-hash:
+            type: CLASS_BASED
+            props:
+              strategy: standard
+              algorithmClassName: com.example.payment.infrastructure.sharding.MerchantNoHashShardingAlgorithm
+    props:
+      sql-show: true
+
+mybatis:
+  configuration:
+    map-underscore-to-camel-case: true
+    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+
+rocketmq:
+  name-server: 127.0.0.1:9876
+  producer:
+    group: payment-platform-producer-group
+
+payment:
+  mq:
+    pay-order-topic: pay.order.changed
+    outbox-scan-batch-size: 100
+    outbox-retry-seconds: 30
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics
